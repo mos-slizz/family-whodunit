@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Whodunit — TV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Special+Elite&family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tv.css">
+</head>
+<body data-phase="boot">
+<div id="gate"><div class="gatecard"><div class="logo">🔍</div><h1>Family Whodunit</h1><p>Tap anywhere to start the TV</p><small>Turn the volume up. Inspector Marmalade likes to talk.</small></div></div>
+<header id="top">
+  <div class="brand">🔍 Family Whodunit</div>
+  <div id="bubblewrap"><span class="hostface">🐈</span><div id="bubble"></div></div>
+  <div id="timer" hidden><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="45"/><circle class="fg" cx="50" cy="50" r="45"/></svg><span></span></div>
+</header>
+<main id="stage" class="stage"></main>
+<section id="strip"></section>
+<footer id="foot">
+  <span id="roomtag"></span><span id="voicetag" class="voicetag"></span>
+  <span id="status" hidden></span>
+  <span class="ctl"><button id="btnSkip" title="Skip (→ or space)">⏭</button><button id="btnMute" title="Voice on/off">🔊</button><button id="btnSettings" title="Settings">⚙️</button><button id="btnNewGame" title="Back to lobby">🏠</button></span>
+</footer>
+<div id="toasts"></div>
+<canvas id="confetti" hidden></canvas>
+<div id="settings" hidden>
+  <div class="modal">
+    <h2>⚙️ Settings</h2>
+    <label class="row"><input type="checkbox" id="setVoice"> Inspector voice</label>
+    <label class="row"><input type="checkbox" id="setSfx"> Sound effects</label>
+    <label class="row">Browser voice for custom lines <select id="setBrowserVoice"></select> <button id="btnTestVoice">Test</button></label>
+    <h3>🏠 Family cases</h3>
+    <p class="muted">Write your own crimes with real names and inside jokes. They get mixed into the rotation.</p>
+    <div id="customList"></div>
+    <div class="addrow"><input id="ccEmoji" placeholder="🏠" maxlength="4" style="width:3.5em"><input id="ccTitle" placeholder="the Missing Left Sock (becomes 'The Case of …')"><input id="ccBlurb" placeholder="What happened? (2 sentences, the Inspector reads this aloud)"><button id="btnAddCustom">Add</button></div>
+    <h3>🗂️ Saved profiles</h3>
+    <p class="muted">Ranks, stickers and unlocked suspects are saved on this TV browser.</p>
+    <button id="btnResetProfiles" class="danger">Erase all profiles</button>
+    <div class="modalfoot"><button id="btnCloseSettings" class="big">Done</button></div>
+  </div>
+</div>
+<script src="vendor/mqtt.min.js"></script>
+<script src="vendor/qrcode.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/net.js"></script>
+<script src="js/tv.js"></script>
+</body>
+</html>

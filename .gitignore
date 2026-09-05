@@ -1,0 +1,5 @@
+tools/.venv/
+tools/models/
+audio/_tmp.wav
+.DS_Store
+.claude/

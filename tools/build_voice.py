@@ -58,6 +58,7 @@ else:
     def synth(text, path):
         wav = model.generate(text, exaggeration=args.exaggeration, cfg_weight=args.cfg)
         ta.save(path, wav, model.sr)
+all_hashes = set(fnv(t) for t in todo)
 if args.only:
     todo = [t for t in todo if args.only.lower() in t.lower()]
 built = []; n = 0
@@ -68,13 +69,13 @@ for t in todo:
         built.append(h); continue
     spoken = t.replace('Wi-Fi', 'wifi').replace('T-Rex', 'tee rex').replace('A.M.', 'A M')
     synth(spoken, tmp)
-    subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', tmp, '-ac', '1', '-ar', '24000', '-b:a', '64k', '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', mp3], check=True)
+    subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', tmp, '-ac', '1', '-ar', '24000', '-b:a', '64k', '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,apad=pad_dur=0.06', mp3], check=True)
     built.append(h); n += 1
     if n % 20 == 0: print(n, 'synthesized…', flush=True)
 if os.path.exists(tmp): os.remove(tmp)
-# prune clips that no longer correspond to any line
-keep = set(built)
+# prune clips that no longer correspond to any line; manifest lists every clip on disk
 for f in os.listdir(outdir):
-    if f.endswith('.mp3') and f[:-4] not in keep: os.remove(os.path.join(outdir, f))
+    if f.endswith('.mp3') and f[:-4] not in all_hashes: os.remove(os.path.join(outdir, f))
+keep = set(f[:-4] for f in os.listdir(outdir) if f.endswith('.mp3'))
 json.dump({'ext': 'mp3', 'voice': args.engine + ':' + args.voice, 'clips': sorted(keep)}, open(os.path.join(outdir, 'manifest.json'), 'w'))
 print('done:', n, 'new,', len(keep), 'total clips')

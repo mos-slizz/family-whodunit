@@ -280,8 +280,11 @@
   async function enterLineup() {
     setPhase('lineup'); const ok = guard(); const cur = G.cur;
     const list = active();
-    if (cur.accomplice) send(cur.accomplice, { s: 'discuss', me: pub(cur.accomplice), title: '🤝 Accomplice', sub: 'Your partner ' + charOf(P(cur.culprit)).emoji + ' ' + P(cur.culprit).name + ' claims: ' + alibiView(cur.alibis[cur.culprit]).map((v) => v.emoji).join(' ') + '. Back them up!', alibi: alibiView(cur.alibis[cur.accomplice]), players: pubList(cur.accomplice), secs: secsFor(25) });
-    list.forEach((p) => { if (p.pid === cur.accomplice) return; send(p.pid, { s: 'discuss', me: pub(p.pid), title: p.pid === cur.culprit ? '🤫 Keep a straight face' : '🔍 Study the lineup', sub: p.pid === cur.culprit ? 'Your story: stick to it!' : 'Who looks shifty?', alibi: alibiView(cur.alibis[p.pid]), players: pubList(p.pid), secs: secsFor(25) }); });
+    const lineupScreens = (secs) => list.forEach((p) => {
+      if (p.pid === cur.accomplice) return send(p.pid, { s: 'discuss', me: pub(p.pid), title: '🤝 Accomplice', sub: 'Your partner ' + charOf(P(cur.culprit)).emoji + ' ' + P(cur.culprit).name + ' claims: ' + alibiView(cur.alibis[cur.culprit]).map((v) => v.emoji).join(' ') + '. Back them up!', alibi: alibiView(cur.alibis[p.pid]), players: pubList(p.pid), secs });
+      send(p.pid, { s: 'discuss', me: pub(p.pid), title: p.pid === cur.culprit ? '🤫 Keep a straight face' : '🔍 Study the lineup', sub: p.pid === cur.culprit ? 'Your story: stick to it!' : 'Who looks shifty?', alibi: alibiView(cur.alibis[p.pid]), players: pubList(p.pid), secs });
+    });
+    lineupScreens(0);
     renderStrip({ alibis: true });
     stage(caseHeader() + '<h2 class="ph">The Lineup</h2><div class="lineup">' + list.map((p) => mug(p, { id: 'lc-' + p.pid, extra: '<div class="row">' + alibiView(cur.alibis[p.pid]).map((v) => '<div class="att"><div class="e">' + v.emoji + '</div><div class="l">' + v.name + '</div></div>').join('') + '</div>' })).join('') + '</div>');
     skipFn = () => ok() && enterClue(0);
@@ -294,6 +297,7 @@
     }
     if (!ok()) return;
     await Voice.say(line('lineupAfter')); if (!ok()) return;
+    lineupScreens(secsFor(20));
     startTimer(20, () => ok() && enterClue(0));
   }
 
@@ -358,7 +362,8 @@
     setPhase('board'); const ok = guard(); const cur = G.cur;
     const sts = shuffle(cur.statements);
     if (cur.twist === 'serum') { const hon = sts.filter((s) => s.honest); if (hon.length) rnd(hon).verified = true; }
-    sendAll((p) => ({ s: 'discuss', me: pub(p.pid), title: '🗣️ The witness board', sub: 'Who do you believe?', alibi: alibiView(cur.alibis[p.pid]), players: pubList(p.pid), secs: secsFor(22) + sts.length * 3, clues: (cur.cluesShown || []).map((c) => c.emoji) }));
+    const boardScreens = (secs) => sendAll((p) => ({ s: 'discuss', me: pub(p.pid), title: '🗣️ The witness board', sub: 'Who do you believe?', alibi: alibiView(cur.alibis[p.pid]), players: pubList(p.pid), secs, clues: (cur.cluesShown || []).map((c) => c.emoji) }));
+    boardScreens(0);
     renderStrip({ alibis: true });
     stage(caseHeader() + '<h2 class="ph">The Witness Board</h2><div class="board" id="board">' + (sts.length ? '' : '<div class="nost">Nobody said a word. Suspicious.</div>') + '</div>');
     skipFn = () => ok() && enterFinal();
@@ -374,6 +379,7 @@
       if (s.contradiction && !anyContra) { anyContra = true; SFX.play('buzz'); await Voice.say(line('contradiction')); }
     }
     if (!ok()) return;
+    boardScreens(secsFor(22));
     startTimer(22, () => ok() && enterFinal());
   }
 
